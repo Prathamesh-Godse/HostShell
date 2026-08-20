@@ -1,0 +1,37 @@
+[Unit]
+Description=hostshell SSH server
+After=network.target
+
+[Service]
+Type=simple
+User=hostshell
+Group=hostshell
+WorkingDirectory=/opt/hostshell
+ExecStart=/opt/hostshell/hostshell serve
+Restart=on-failure
+RestartSec=2
+
+# Overridable without a rebuild — see internal/server/server.go for
+# what each of these controls and its default if unset.
+Environment=HOSTSHELL_SSH_HOST=0.0.0.0
+Environment=HOSTSHELL_SSH_PORT=23231
+Environment=HOSTSHELL_SSH_HOST_KEY=/opt/hostshell/hostshell_host_key
+
+# Content (About/Projects/Contact/ServerCodex/Writeups — everything
+# under internal/content/data/) is read from this real directory instead
+# binary's embedded copy when set — see internal/content/content.go.
+# The deploy-content GitHub Actions workflow (.github/workflows/) syncs
+# the "content" branch into this exact path, so pushes there update the
+# live site without a rebuild or restart of this service.
+Environment=HOSTSHELL_CONTENT_DIR=/opt/hostshell/content
+
+# Basic hardening. Loosen if the box's setup needs something these
+# block (e.g. ProtectSystem=strict + a WorkingDirectory outside /opt
+# would need a matching ReadWritePaths=).
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/opt/hostshell
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,22 @@
+NAME
+hostshell - Prathamesh Godse, Linux systems and cloud engineer
+===
+SYNOPSIS
+Network Security Engineer · NOC/SOC · Linux and cloud infrastructure
+===
+DESCRIPTION
+Final-year CS student, MITE (VTU) — CGPA 7.79. Runs LanManLab, a learn-in-public homelab and cybersecurity brand documented as INC-numbered incident writeups and ADR-style decision logs. Daily driver: Omarchy (Arch/Hyprland) — minimal, terminal-native, no decoration for decoration's sake.
+===
+EXPERIENCE
+NITK, Research Intern — Deep Learning, Computer Vision and Neuro-Symbolic AI (Feb-May 2026). Built a video-based collision prediction pipeline (Mask R-CNN, ReID, BoT-SORT, track graph, deterministic physics engine), combining deep learning with rule-based symbolic reasoning. Authored theory documentation and architecture diagrams.
+===
+SKILLS
+Linux and Systems: Linux (RHEL/Ubuntu/Debian), systemd, Bash, KVM/QEMU/libvirt, Docker, Kubernetes, Nginx, MariaDB, server hardening
+Networking and Security: TCP/IP, DNS, HTTP/HTTPS, pfSense, Tailscale/WireGuard, UFW, Fail2Ban, SSH hardening, TLS, Wireshark, Snort, Security Onion, SIEM
+Cloud and IaC: AWS (EC2, IAM, S3, VPC), Terraform, Ansible, GitHub Actions
+Monitoring: Prometheus, Grafana, Loki, cAdvisor, Node Exporter
+Programming: Python, Bash
+AI and Research: Deep Learning, Computer Vision, Neuro-Symbolic AI, OpenCV, graph-based reasoning
+===
+AUTHOR
+Written by Prathamesh Godse <prathameshgodse0402@gmail.com>.

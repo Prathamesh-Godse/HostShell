@@ -1,0 +1,40 @@
+# Detective, not preventive: this can't stop a push from landing (that
+# needs branch protection requiring PRs on "content" too, which adds
+# friction to the low-friction branch on purpose) — it fails loudly and
+# visibly (a red X in the Actions tab, and a failed required-status-check
+# if you turn that on for "content" in branch protection) whenever a
+# push to content touches anything outside internal/content/data/,
+# which is everything deploy-content.yml is allowed to sync. Even
+# without branch protection enforcing it, this is a clear, immediate
+# signal that something landed on content that shouldn't have.
+
+name: Guard content branch scope
+
+on:
+  push:
+    branches: [content]
+
+jobs:
+  check-scope:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch main for comparison
+        run: git fetch origin main
+
+      - name: Verify only content paths changed
+        run: |
+          BASE=$(git merge-base origin/main HEAD)
+          CHANGED=$(git diff --name-only "$BASE" HEAD)
+          echo "Changed since diverging from main:"
+          echo "$CHANGED"
+
+          VIOLATIONS=$(echo "$CHANGED" | grep -Ev '^internal/content/data/' || true)
+          if [ -n "$VIOLATIONS" ]; then
+            echo "::error::content branch touched files outside internal/content/data/:"
+            echo "$VIOLATIONS"
+            exit 1
+          fi

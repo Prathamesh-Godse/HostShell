@@ -1,0 +1,81 @@
+# UNTESTED TEMPLATE — same caveat as deploy-content.yml: I can't verify
+# this against your actual server. Treat every value as a placeholder.
+#
+# What this does: on push to "main" touching Go source, build a static
+# Linux binary, stage it (plus the current systemd unit files, in case
+# those changed too) on the server, then run the ONE whitelisted script
+# that installs them and restarts both services as root. See
+# deploy/scripts/apply-deploy.sh and deploy/sudoers/hostshell-deploy
+# for the two halves of that setup — the sudoers rule needs to exist on
+# the server BEFORE this workflow's restart step will work.
+#
+# This is "main"'s counterpart to deploy-content.yml: main needs an
+# actual rebuild + service restart (Go code changed), content branch
+# pushes just need files copied into place (no rebuild, no restart) —
+# see internal/content/content.go for why that split works.
+#
+# Required GitHub secrets — same ones deploy-content.yml uses:
+#   HOSTSHELL_SERVER_HOST, HOSTSHELL_SERVER_USER, HOSTSHELL_SERVER_SSH_KEY
+#
+# Same reachability caveat as deploy-content.yml applies: GitHub's
+# runners need a path to your server (public port, or a tunnel the
+# runner joins) — if that's not realistic for a home server, swap
+# `runs-on: ubuntu-latest` for a self-hosted runner on the box itself
+# and drop the scp/ssh steps for local file copies + a direct call to
+# apply-deploy.sh.
+
+name: Deploy core functionality
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cmd/**'
+      - 'internal/tui/**'
+      - 'internal/server/**'
+      - 'internal/content/content.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'deploy/systemd/**'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Build
+        run: |
+          go mod download
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o hostshell ./cmd/hostshell
+
+      - name: Stage binary
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOSTSHELL_SERVER_HOST }}
+          username: ${{ secrets.HOSTSHELL_SERVER_USER }}
+          key: ${{ secrets.HOSTSHELL_SERVER_SSH_KEY }}
+          source: "hostshell"
+          target: "/opt/hostshell/_incoming"
+
+      - name: Stage systemd units
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOSTSHELL_SERVER_HOST }}
+          username: ${{ secrets.HOSTSHELL_SERVER_USER }}
+          key: ${{ secrets.HOSTSHELL_SERVER_SSH_KEY }}
+          source: "deploy/systemd/hostshell-ssh.service,deploy/systemd/hostshell-ttyd.service"
+          target: "/opt/hostshell/_incoming"
+          strip_components: 2
+
+      - name: Apply deploy (install + restart, via the one whitelisted script)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOSTSHELL_SERVER_HOST }}
+          username: ${{ secrets.HOSTSHELL_SERVER_USER }}
+          key: ${{ secrets.HOSTSHELL_SERVER_SSH_KEY }}
+          script: sudo /opt/hostshell/deploy/scripts/apply-deploy.sh

@@ -1,0 +1,13 @@
+# Requires review from the listed owner before a PR touching these
+# paths can be merged — but ONLY if the target branch's protection
+# rule has "Require review from Code Owners" turned on. This file by
+# itself does nothing; see the branch protection setup steps.
+
+/cmd/                          @Prathamesh-Godse
+/internal/tui/                 @Prathamesh-Godse
+/internal/server/               @Prathamesh-Godse
+/internal/content/content.go    @Prathamesh-Godse
+/go.mod                         @Prathamesh-Godse
+/go.sum                         @Prathamesh-Godse
+/.github/                       @Prathamesh-Godse
+/deploy/                        @Prathamesh-Godse

@@ -1,0 +1,33 @@
+[Unit]
+Description=hostshell web delivery (ttyd)
+After=network.target
+
+[Service]
+Type=simple
+User=hostshell
+Group=hostshell
+WorkingDirectory=/opt/hostshell
+# ttyd is a separate binary (not Go) — install it via your distro's
+# package manager or from https://github.com/tsl0922/ttyd/releases.
+# ttyd is read-only by default; -W is what lets the browser actually
+# send keystrokes back to the program — required here since hostshell
+# is entirely keyboard-driven, not optional hardening. Deliberately no
+# --once: that flag makes ttyd itself exit after a single connection
+# (meant for one-shot terminal sharing, not a public site) — omitting
+# it keeps ttyd running indefinitely while it spawns a fresh process
+# per browser connection on its own, which is the actual default.
+ExecStart=/usr/bin/ttyd -p 7681 -i 127.0.0.1 -W /opt/hostshell/hostshell
+Restart=on-failure
+RestartSec=2
+
+# Same content-dir override as hostshell-ssh.service — ttyd inherits
+# this and passes it through to the hostshell process it spawns per
+# connection, so web and SSH always read the identical live content.
+Environment=HOSTSHELL_CONTENT_DIR=/opt/hostshell/content
+
+NoNewPrivileges=true
+ProtectSystem=strict
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

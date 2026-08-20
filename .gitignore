@@ -1,0 +1,11 @@
+# Compiled binary — build it locally with `go build -o hostshell ./cmd/hostshell`
+/hostshell
+
+# SSH host key generated on first `hostshell serve` run — never commit
+# this, it's the server's identity, not source code
+hostshell_host_key
+*.pub
+
+# Go build cache / test artifacts, if any end up in the repo root
+*.test
+*.out

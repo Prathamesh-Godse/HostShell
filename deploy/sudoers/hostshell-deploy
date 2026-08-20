@@ -1,0 +1,19 @@
+# NOT applied automatically — this is a reference file for you to copy
+# in manually on the server, since sudoers mistakes can lock you out of
+# a box and I have no way to test this against your actual setup.
+#
+# Install with:
+#   sudo visudo -f /etc/sudoers.d/hostshell-deploy
+# then paste the (edited) line below and save.
+#
+# Replace "deployuser" with your actual HOSTSHELL_SERVER_USER value.
+# This grants passwordless sudo for ONE exact command — nothing else,
+# no wildcards. The deploy SSH key can restart hostshell's services and
+# do literally nothing else as root.
+
+deployuser ALL=(root) NOPASSWD: /opt/hostshell/deploy/scripts/apply-deploy.sh
+
+# After adding this, also lock down the script itself so the deploy
+# user can't edit what sudo is about to run as root:
+#   sudo chown root:root /opt/hostshell/deploy/scripts/apply-deploy.sh
+#   sudo chmod 755 /opt/hostshell/deploy/scripts/apply-deploy.sh

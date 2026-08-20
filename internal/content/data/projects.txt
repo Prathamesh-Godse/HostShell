@@ -1,0 +1,31 @@
+LanManLab
+ongoing
+https://github.com/Prathamesh-Godse/LanManLab
+continuously-run homelab and cybersecurity brand
+Proxmox VE, pfSense, Docker, Prometheus, Grafana, Loki, Tailscale, Suricata, Zeek
+not yet chosen
+Continuously-run homelab on bare-metal Proxmox VE — pfSense router, Dockerized Prometheus/Grafana/Loki stack, Tailscale remote access. Scheduled fault-injection tests, self-built dashboards, systemd-watchdog auto-recovery for repeat failure classes. Every incident documented as an INC report.
+===
+hostshell (this app)
+in progress
+https://github.com/Prathamesh-Godse/hostshell
+terminal-native portfolio, one binary, two deliveries
+Go, Bubble Tea, Lipgloss, Wish, ttyd, xterm.js
+not yet chosen
+Terminal-native portfolio — one Go binary served two ways: SSH (via Wish) and browser (via ttyd + xterm.js). You're looking at it right now.
+===
+IaC Pipeline
+done, publishing pending
+https://github.com/Prathamesh-Godse/IaC-Pipeline
+Terraform + Ansible + GitHub Actions pipeline
+Terraform, Ansible, AWS, GitHub Actions
+not yet chosen
+Multi-tier AWS environment (VPC, subnets, security groups, EC2) via Terraform with S3/DynamoDB remote state. Ansible driven by Terraform-generated dynamic inventory. Resolved OIDC subject-claim, state-lock recovery, and runner-IP security-group issues end-to-end.
+===
+ServerForge
+done, publishing pending
+https://github.com/Prathamesh-Godse/ServerForge
+config-driven Bash and systemd hardening framework
+Bash, systemd
+not yet chosen
+Modular, config-driven Bash/systemd framework provisioning and hardening Linux servers across 6 modules (SSH, firewall, kernel tuning, SSL, logging, orchestration). Idempotent, reboot-persistent, dry-run/rollback tested across Ubuntu 22.04, 24.04, and Debian 12.

@@ -1,0 +1,54 @@
+# UNTESTED TEMPLATE — I can't verify this against your actual server;
+# treat every value below as a placeholder to fill in and test yourself.
+#
+# What this does: on every push to the "content" branch that touches
+# anything under internal/content/data/, copy that whole directory to a
+# real path on your server (matching HOSTSHELL_CONTENT_DIR in the
+# systemd units under deploy/systemd/). Every content.go function reads
+# through that directory at runtime whenever HOSTSHELL_CONTENT_DIR is
+# set — about.txt, contact.txt, and projects.txt included, not just
+# ServerCodex/Writeups — so the live site picks up any change here
+# immediately: no rebuild, no restart, no involvement of the "main"
+# branch at all. That's the intended split: "main" is Go source and
+# needs an actual build; "content" is just files being copied into
+# place.
+#
+# Required GitHub secrets (Settings → Secrets and variables → Actions):
+#   HOSTSHELL_SERVER_HOST   — your server's hostname or IP
+#   HOSTSHELL_SERVER_USER   — the SSH user to deploy as (e.g. "hostshell")
+#   HOSTSHELL_SERVER_SSH_KEY — a private key with write access to
+#                               /opt/hostshell/content on that server
+#                               (generate a dedicated deploy key, don't
+#                               reuse your personal one)
+#
+# This assumes your home server is reachable from GitHub's runners
+# (a public IP/port, or a Tailscale/WireGuard tunnel with the runner
+# joined to it — plain "localhost" from earlier testing won't work
+# here). If it's not reachable that way, a self-hosted GitHub Actions
+# runner on the server itself is the more realistic path — swap
+# `runs-on: ubuntu-latest` for `runs-on: self-hosted` and drop the SSH
+# step entirely in favor of a local `cp -r`.
+
+name: Deploy content
+
+on:
+  push:
+    branches: [content]
+    paths:
+      - 'internal/content/data/**'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync content to the server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOSTSHELL_SERVER_HOST }}
+          username: ${{ secrets.HOSTSHELL_SERVER_USER }}
+          key: ${{ secrets.HOSTSHELL_SERVER_SSH_KEY }}
+          source: "internal/content/data/"
+          target: "/opt/hostshell/content"
+          strip_components: 3
